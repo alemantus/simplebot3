@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- <xacro:include filename="$(find simplebot_description)/urdf/wheel.xacro"/> -->
+
+  <!-- Redundant drive_wheel macro removed, using the one from drive.xacro -->
+  
+    <gazebo reference="lidar_link">
+  <sensor name="lidar" type="gpu_lidar">
+    <topic>scan</topic>
+    <update_rate>10</update_rate>
+    
+    <gz_frame_id>lidar_link</gz_frame_id> 
+    
+    <lidar>
+      <scan>
+        <horizontal>
+          <samples>720</samples>
+          <resolution>1</resolution>
+          <min_angle>-3.14159265</min_angle> 
+          <max_angle>3.14159265</max_angle>
+        </horizontal>
+      </scan>
+      <range>
+        <min>0.15</min>
+        <max>12.0</max>
+      </range>
+    </lidar>
+    <always_on>true</always_on>
+    <visualize>true</visualize>
+  </sensor>
+</gazebo>
+</robot>

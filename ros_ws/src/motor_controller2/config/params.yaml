@@ -1,0 +1,18 @@
+/**:
+  ros__parameters:
+    # Hardware settings
+    serial_port: "/dev/motor_controller"
+    baud_rate: 115200
+    
+    # Kinematics (Mecanum)
+    # wheel_radius: radius of the wheel in meters
+    # track_width: distance between left and right wheels in meters (Lx)
+    # wheel_base: distance between front and rear wheels in meters (Ly)
+    wheel_radius: 0.035
+    track_width: 0.222
+    wheel_base: 0.26  # Based on (0.13 * 2) from odom.py? Or 0.335 / 2?
+    
+    # PID Parameters for the motor controller
+    VEL_KP: 3.0
+    VEL_KI: 0.0
+    VEL_KD: 0.002

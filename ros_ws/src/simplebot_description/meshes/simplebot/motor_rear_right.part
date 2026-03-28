@@ -1,0 +1,13 @@
+{
+    "configuration": "default",
+    "documentId": "58d69eaf54d5097cb2ee2932",
+    "documentMicroversion": "8fe4cf346b5d9f19e0049296",
+    "elementId": "7cb0b81673ac10f236b6e9ed",
+    "fullConfiguration": "default",
+    "id": "MpCguUOMKWZwDF7cD",
+    "isStandardContent": false,
+    "name": "motor_rear_right <1>",
+    "partId": "ReBD",
+    "suppressed": false,
+    "type": "Part"
+}

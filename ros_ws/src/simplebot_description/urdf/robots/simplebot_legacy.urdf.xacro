@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<robot name="simplebot2" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:arg name="robot_name" default="simplebot"/>
+  <xacro:arg name="prefix" default=""/>
+  <xacro:arg name="use_gazebo" default="false"/>
+
+
+  <xacro:include filename="$(find simplebot_description)/urdf/parts.xacro"/>
+  <xacro:include filename="$(find simplebot_description)/urdf/drive.xacro"/>
+  <xacro:include filename="$(find simplebot_description)/urdf/gazebo.xacro"/>
+
+  <link name="base_footprint"/>
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <inertial>
+      <origin xyz="-3.23026e-10 4.0693e-18 0.0211091" rpy="0 0 0"/>
+      <mass value="0.426296"/>
+      <inertia ixx="0.00184221" ixy="9.36048e-11" ixz="-1.22606e-12" iyy="0.00190478" iyz="2.8119e-08" izz="0.00332037"/>
+    </inertial>
+
+    <xacro:base_link_visuals />
+
+    <collision>
+      <origin xyz="-0.085 0 -0.005" rpy="0 0 0"/>
+      <geometry><box size="0.25 0.16 0.02"/></geometry>
+    </collision>
+  </link>
+
+  <xacro:drive_wheel side="left"  position="front" x="0.065"  y="0.103008"  z="0.010"/>
+  <xacro:drive_wheel side="right" position="front" x="0.065"  y="-0.103008" z="0.010"/>
+  <xacro:drive_wheel side="left"  position="back"  x="-0.065" y="0.103008"  z="0.010"/>
+  <xacro:drive_wheel side="right" position="back"  x="-0.065" y="-0.103008" z="0.010"/>
+
+
+
+    <!--  <xacro:include filename="$(find simplebot_description)/urdf/control/velocity_control_plugin.urdf.xacro" />
+    <xacro:load_velocity_control_plugin use_gazebo="$(arg use_gazebo)"/> -->
+
+    <xacro:include filename="$(find simplebot_description)/urdf/control/gazebo_sim_ros2_control.urdf.xacro" />
+    <xacro:load_gazebo_sim_ros2_control_plugin
+      robot_name="$(arg robot_name)"
+      use_gazebo="$(arg use_gazebo)"/>
+
+    <xacro:include filename="$(find simplebot_description)/urdf/control/simplebot_ros2_control.urdf.xacro" />
+
+
+
+</robot>
+
+

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="visual_part" params="name mesh_file xyz rpy color">
+    <visual name="${name}">
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/simplebot/${mesh_file}.stl"/>
+      </geometry>
+      <material name="${name}_material">
+        <color rgba="${color}"/>
+      </material>
+    </visual>
+  </xacro:macro>
+
+  <xacro:macro name="base_link_visuals">
+    <xacro:visual_part name="chassis_plate" mesh_file="base_link" xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.9 0.9 0.9 1"/>
+    
+    <xacro:visual_part name="frame1" mesh_file="frame1" xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.8 0.9 1"/>
+    <xacro:visual_part name="frame2" mesh_file="frame2" xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.8 0.9 1"/>
+    <xacro:visual_part name="frame3" mesh_file="frame3" xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.8 0.9 1"/>
+    <xacro:visual_part name="frame4" mesh_file="frame4" xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.8 0.9 1"/>
+
+    <xacro:visual_part name="motor_front_right" mesh_file="motor_front_right"  xyz="0.0475 0 0.1625" rpy="-1.5708 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="motor_front_left" mesh_file="motor_front_left"  xyz="0.0825 -6.93889e-18 -0.1375" rpy="1.5708 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="motor_rear_left" mesh_file="motor_rear_left"  xyz="-0.0825 1.38778e-17 0.0325" rpy="-1.5708 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="motor_rear_right" mesh_file="motor_rear_right"  xyz="-0.0475 1.04083e-17 -0.0075" rpy="1.5708 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+
+    <xacro:visual_part name="bracket_fr" mesh_file="motor_bracket_front_right" xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="bracket_fl" mesh_file="motor_bracket_front_left"  xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="bracket_rl" mesh_file="motor_bracket_rear_left"  xyz="-0.085 1.04083e-17 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="bracket_rr" mesh_file="motor_bracket_rear_right"  xyz="-0.085 0 -0.005" rpy="0 0 -1.5708" color="0.6 0.6 0.6 1"/>
+    
+    <xacro:visual_part name="side_bracket_left" mesh_file="side_bracket_left"  xyz="-0.085 1.04083e-17 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+    <xacro:visual_part name="side_bracket_right" mesh_file="side_bracket_right"  xyz="-0.085 1.04083e-17 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+
+    <xacro:visual_part name="roarm_bracket" mesh_file="roarm_bracket"  xyz="-0.085 1.04083e-17 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+
+    <xacro:visual_part name="a010_bracket" mesh_file="a010_bracket"  xyz="-0.085 2.42861e-17 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+
+    <xacro:visual_part name="top_bracket" mesh_file="top_bracket"  xyz="-0.085 2.42861e-17 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/>
+
+    <!-- <xacro:visual_part name="femto_bolt_bracket" mesh_file="femto_bolt_bracket"  xyz="-0.085 0 -0.005" rpy="0 -0 -1.5708" color="0.6 0.6 0.6 1"/> -->
+
+
+  </xacro:macro>
+
+
+</robot>

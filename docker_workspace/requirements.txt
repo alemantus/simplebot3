@@ -1,0 +1,33 @@
+# Roarm
+aiohttp
+ujson
+aiortc
+av
+opencv-python
+empy
+lark
+catkin_pkg
+pytest
+flake8
+roarm-sdk==0.1.0
+simplejson
+requests
+
+setuptools
+adafruit-circuitpython-lsm6ds
+scipy 
+pyserial
+hidapi 
+adafruit-circuitpython-seesaw
+pyyaml
+pymongo
+psutil
+tornado
+argcomplete
+numpy
+colcon-common-extensions
+
+#betterlaunch dependencies
+click
+setproctitle
+docstring-parser

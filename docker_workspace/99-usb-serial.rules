@@ -1,0 +1,6 @@
+#SUBSYSTEM=="tty", ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", SYMLINK+="motor_controller"
+
+KERNEL=="ttyACM*", ENV{ID_SERIAL_SHORT}=="E66141040363B839",SYMLINK+="motor_controller"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="00dd", SYMLINK+="mcp2221"
+KERNEL=="ttyUSB*", ENV{ID_SERIAL_SHORT}=="ee086dc1ffe5ed11a575d3a80b2af5ab", SYMLINK+="sllidar"
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="e839bd62061cef11ae8fa1d94909ffd0", SYMLINK+="roarm"

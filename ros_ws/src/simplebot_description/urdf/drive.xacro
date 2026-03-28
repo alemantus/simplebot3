@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Include the wheel definition -->
+  <xacro:include filename="$(find simplebot_description)/urdf/wheel.xacro"/>
+
+  <!--
+  drive_wheel macro
+  Creates:
+    - wheel link
+    - wheel joint
+    - Gazebo friction direction (for mecanum simulation)
+
+  Parameters:
+    side      : left / right
+    position  : front / rear
+    x y z     : wheel position relative to base_link
+    fdir1     : friction direction vector for Gazebo
+  -->
+  <xacro:macro name="drive_wheel" params="side position x y z fdir1">
+
+    <!-- Wheel link -->
+    <xacro:wheel
+        name="${position}_${side}_wheel"
+        color="0.1 0.1 0.1 1"
+        fdir1="${fdir1}" />
+
+    <!-- Wheel joint -->
+    <joint name="${position}_${side}_wheel_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${position}_${side}_wheel"/>
+
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/>
+
+      <!-- Wheel rotates around Y axis -->
+      <axis xyz="0 1 0"/>
+
+      <limit effort="5.0" velocity="20.0"/>
+      <dynamics damping="0.2" friction="0.1"/>
+    </joint>
+
+  </xacro:macro>
+
+
+</robot>

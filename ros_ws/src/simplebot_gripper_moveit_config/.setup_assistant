@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: simplebot_description
+    relative_path: urdf/robots/simplebot_description.urdf.xacro
+  srdf:
+    relative_path: config/simplebot2.srdf
+  package_settings:
+    author_name: alexander
+    author_email: ses@ses.ses
+    generated_timestamp: 1773676790
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
