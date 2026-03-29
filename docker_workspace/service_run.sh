@@ -18,7 +18,6 @@ docker run --network host \
     --group-add=messagebus \
     --volume $PARENT_DIR/ros_ws/:/home/alexander/simplebot3/ros_ws/ \
     --env="DISPLAY=$DISPLAY" \
-    --runtime=nvidia \
     --env="NVIDIA_VISIBLE_DEVICES=all" \
     --env="NVIDIA_DRIVER_CAPABILITIES=all" \
     --env="__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_nvidia.json" \
