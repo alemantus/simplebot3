@@ -4,6 +4,9 @@
 <xacro:include filename="$(find simplebot_description)/urdf/roarm_m2/materials.xacro" />
 <xacro:include filename="$(find simplebot_description)/urdf/roarm_m2/roarm_m2.trans" />
 <xacro:include filename="$(find simplebot_description)/urdf/roarm_m2/roarm_m2.gazebo" />
+<xacro:include filename="$(find simplebot_description)/urdf/roarm_m2/gripper.xacro" />
+
+<!-- ===== ARM LINKS ===== -->
 
 <link name="roarm_base_link">
   <inertial>
@@ -89,99 +92,14 @@
   </collision>
 </link>
 
-
-<link name="gripper_link">
-  <inertial>
-    <origin xyz="0.029 0.0027 -0.00078" rpy="0 0 0" />
-    <mass value="0.0028708" />
-    <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gripper_link.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gripper_link.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="gripper_b">
-  <inertial>
-    <origin xyz="0.029 0.0027 -0.00078" rpy="0 0 0" />
-    <mass value="0.0028708" />
-    <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/Gripper-B.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/Gripper-B.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-  </collision>
-</link>
-
-<link name="left_finger">
-  <inertial>
-    <origin xyz="0.0 0.0 -0.0" rpy="0 0 0" />
-    <mass value="0.0028708" />
-    <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/left_finger.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/left_finger.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-  </collision>
-</link>
-
-
-<link name="right_finger">
-  <inertial>
-    <origin xyz="0.0 0.0 -0.0" rpy="0 0 0" />
-    <mass value="0.0028708" />
-    <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/right_finger.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/right_finger.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-  </collision>
-</link>
-
-
-<!--
-
+<!-- tool0: the tool mounting frame at the end of link3.
+     This is where the gripper attaches. -->
+<link name="tool0" />
+<link name="link5" />
 
 <link name="link4">
   <inertial>
-    <origin xyz="0.024599 0 0.026788" rpy="0 0 0" />
+    <origin xyz="0.029 0.0027 -0.00078" rpy="0 0 0" />
     <mass value="0.0028708" />
     <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
   </inertial>
@@ -200,53 +118,8 @@
   </collision>
 </link>
 
-<link name="link5">
-  <inertial>
-    <origin xyz="0.0 0 0.0" rpy="0 0 0" />
-    <mass value="0.0028708" />
-    <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/link5.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/link5.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-  </collision>
-</link>
+<!-- ===== ARM JOINTS ===== -->
 
-
-<link name="gripper">
-  <inertial>
-    <origin xyz="0.0 0 0.0" rpy="0 0 0" />
-    <mass value="0.0028708" />
-    <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
-  </inertial>
-  <visual>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/Gripper-B.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-    <material name="silver"/>
-  </visual>
-  <collision>
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/Gripper-B.stl"  scale="1.0 1.0 1.0"/>
-    </geometry>
-  </collision>
-</link>
-
--->
-
-
-  
 <joint name="roarm_base_link_to_link1" type="revolute">
   <origin xyz="0.0100000008759151 0 0.123059270461044" rpy="0 0 0" />
   <parent link="roarm_base_link" />
@@ -271,44 +144,32 @@
   <limit lower="-1" upper="2.95" effort="1000" velocity="1.0" />
 </joint>
 
-<joint name="link3_to_gripper_link" type="revolute">
- <origin xyz="-0.003266 -0.21599 -0.00560" rpy="3.1416 0 -1.5708" />
+
+
+<joint name="link3_to_link4" type="revolute">
+  <origin xyz="-0.003266 -0.21599 -0.00560" rpy="3.1416 0 -1.5708" />
   <parent link="link3" />
-  <child link="gripper_link" />
+  <child link="link4" />
   <axis xyz="0 0 1" />
-  <limit lower="-1.5" upper="1.5" effort="0" velocity="0" />
+  <limit lower="-1.5" upper="1.5" effort="10" velocity="1.0" />
 </joint>
 
-<joint name="gripper_link_to_gripper_b" type="revolute">
- <origin xyz="0.09187 0.0079 -0.00078" rpy="0 0 1.5708" />
-  <parent link="gripper_link" />
-  <child link="gripper_b" />
-  <axis xyz="0 1 0" />
-  <limit lower="-1.5" upper="1.5" effort="0" velocity="0" />
+<!-- Fixed joint placing tool0 at the end of link3 (the tool mounting point) -->
+<joint name="link4_to_link5" type="revolute">
+  <origin xyz="0.09187 0.0079 -0.00078" rpy="0 1.5708 0" />
+  <parent link="link4" />
+  <child link="link5" />
+  <axis xyz="0 0 1" />
+  <limit lower="-1.5" upper="1.5" effort="10" velocity="1.0" />
 </joint>
 
-<joint name="left_finger_joint" type="prismatic">
-    <parent link="gripper_b"/>
-    <child link="left_finger"/>
-    
-    <origin xyz="0.00946 -0.08494 -0.05312" rpy="0 0 0"/>
-    
-    <axis xyz="0 0 1"/>
-    
-    <limit lower="-0.02" upper="0.02" effort="10.0" velocity="0.1"/>
+
+<joint name="link4_to_tool0" type="fixed">
+  <origin xyz="0.09187 0.0079 -0.00078" rpy="0 1.5708 0" />
+  <parent link="link4" />
+  <child link="tool0" />
 </joint>
 
-<joint name="right_finger_joint" type="prismatic">
-    <parent link="gripper_b"/>
-    <child link="right_finger"/>
-    
-    <origin xyz="0.00946 -0.08494 0.05312" rpy="0 0 0"/> 
-    
-    <axis xyz="0 0 1"/>
-    
-    <limit lower="-0.02" upper="0.02" effort="10.0" velocity="0.1"/>
-    
-    <mimic joint="left_finger_joint" multiplier="-1.0" offset="0.0"/>
-</joint>
+<xacro:roarm_gripper parent="link5"/>
 
 </robot>

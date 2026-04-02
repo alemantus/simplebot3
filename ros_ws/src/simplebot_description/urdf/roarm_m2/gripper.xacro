@@ -1,0 +1,241 @@
+<?xml version="1.0" ?>
+<!-- Scissor gripper (parallelogram 4-bar linkage) for roarm_m2.
+     Usage: include this file and invoke the macro with the parent link name.
+     Example:
+       <xacro:include filename="...gripper.xacro" />
+       <xacro:roarm_gripper parent="tool0" />
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<xacro:macro name="roarm_gripper" params="parent">
+
+  <!-- ===== GRIPPER LINKS ===== -->
+
+
+
+  <link name="gripper_base">
+    <inertial>
+      <origin xyz="0.029 0.0027 -0.00078" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gripper_base.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gripper_base.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="straight_bracket_left">
+    <inertial>
+      <origin xyz="0.0 0.0 -0.0" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/straight_bracket.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/straight_bracket.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="straight_bracket_right">
+    <inertial>
+      <origin xyz="-0.0432 0.0 -0.0" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="-0.0432 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/straight_bracket.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.0432 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/straight_bracket.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="left_gear_arm">
+    <inertial>
+      <origin xyz="0 0.0 -0.0" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gear_arm.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gear_arm.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="right_gear_arm">
+    <inertial>
+      <origin xyz="-0.0432 0.0 -0.0" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="-0.0432 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gear_arm.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="-0.0432 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/gear_arm.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="left_finger">
+    <inertial>
+      <origin xyz="0.0 0.0 -0.0" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/left_finger.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/left_finger.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="right_finger">
+    <inertial>
+      <origin xyz="0.0 0.0 -0.0" rpy="0 0 0" />
+      <mass value="0.0028708" />
+      <inertia ixx="5.23216E-07" ixy="0" ixz="0" iyy="1.82071E-06" iyz="0" izz="1.60231E-06" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/right_finger.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+      <material name="silver"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/right_finger.stl"  scale="1.0 1.0 1.0"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ===== GRIPPER JOINTS ===== -->
+
+  <!-- Attach gripper adapter (link4) to the arm's tool frame -->
+
+  <joint name="tool0_to_gripper_base" type="fixed">
+    <origin xyz="0.0 0.0 0.0" rpy="0 0.0 0" />
+    <parent link="${parent}" />
+    <child link="gripper_base" />
+  </joint>
+
+  <!-- Parallelogram 4-bar linkage: bracket + gear_arm on each side form a parallelogram.
+       The meshing gears synchronize left/right sides (opposite directions).
+       Fingers stay parallel to gripper_base because the finger joint cancels the parent's rotation. -->
+
+  <!-- THE ONE ACTUATED JOINT - drives the entire gripper open/close -->
+  <joint name="straight_bracket_left_joint" type="revolute">
+      <parent link="gripper_base"/>
+      <child link="straight_bracket_left"/>
+      <origin xyz="0.0315 -0.00496 0.0215" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+  </joint>
+
+  <!-- Right bracket: mirrors left bracket via meshing gears -->
+  <joint name="straight_bracket_right_joint" type="revolute">
+      <parent link="gripper_base"/>
+      <child link="straight_bracket_right"/>
+      <origin xyz="-0.0315 -0.00496 0.0215" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <mimic joint="straight_bracket_left_joint" multiplier="-1.0" offset="0.0"/>
+  </joint>
+
+  <!-- Left gear arm: same side as left bracket, same direction (parallelogram) -->
+  <joint name="left_gear_arm_joint" type="revolute">
+      <parent link="gripper_base"/>
+      <child link="left_gear_arm"/>
+      <origin xyz="0.0105 -0.00496 0.0425" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <mimic joint="straight_bracket_left_joint" multiplier="1.0" offset="0.0"/>
+  </joint>
+
+  <!-- Right gear arm: same side as right bracket, mirrors left gear arm -->
+  <joint name="right_gear_arm_joint" type="revolute">
+      <parent link="gripper_base"/>
+      <child link="right_gear_arm"/>
+      <origin xyz="-0.0105 -0.00496 0.0425" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <mimic joint="straight_bracket_left_joint" multiplier="-1.0" offset="0.0"/>
+  </joint>
+
+  <!-- Left finger: child of left_gear_arm (one path of the parallelogram).
+       Gear arm rotates by +θ, so finger must rotate -θ to stay parallel to gripper_base. -->
+  <joint name="left_finger_joint" type="revolute">
+      <parent link="left_gear_arm"/>
+      <child link="left_finger"/>
+      <origin xyz="0.0432 0.0045 0.0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <mimic joint="straight_bracket_left_joint" multiplier="-1.0" offset="0.0"/>
+  </joint>
+
+  <!-- Right finger: child of straight_bracket_right (one path of the parallelogram).
+       Bracket_right rotates by -θ, so finger must rotate +θ to stay parallel.
+       Since bracket_right = -1 × bracket_left, finger = -(-1) = +1 × bracket_left. -->
+  <joint name="right_finger_joint" type="revolute">
+      <parent link="straight_bracket_right"/>
+      <child link="right_finger"/>
+      <origin xyz="-0.0432 0.0045 0.0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <mimic joint="straight_bracket_left_joint" multiplier="1.0" offset="0.0"/>
+  </joint>
+
+</xacro:macro>
+
+</robot>

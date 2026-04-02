@@ -3,6 +3,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
@@ -10,6 +11,11 @@ def generate_launch_description():
     
     default_model_path = os.path.join(pkg_share, 'urdf', 'robots', 'simplebot_description.urdf.xacro')
     default_rviz_config = os.path.join(pkg_share, 'rviz', 'urdf_config.rviz')
+
+    robot_description = ParameterValue(
+        Command(['xacro ', LaunchConfiguration('model')]),
+        value_type=str
+    )
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -28,7 +34,7 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             parameters=[{
-                'robot_description': Command(['xacro ', LaunchConfiguration('model')]),
+                'robot_description': robot_description,
                 'use_sim_time': LaunchConfiguration('use_sim_time')
             }]
         ),

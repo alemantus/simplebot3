@@ -2,6 +2,7 @@
 
 initial_positions:
   roarm_base_link_to_link1: 0
-  link1_to_link2: 0
+  link1_to_link2: -0.5
   link2_to_link3: 2.618
-  link3_to_gripper_link: 0
+  link3_to_link4: 0
+  link4_to_link5: 0

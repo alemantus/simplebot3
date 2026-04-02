@@ -5,6 +5,8 @@ from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, Appe
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
+
 
 def generate_launch_description():
     pkg_description = get_package_share_directory('simplebot_description')
@@ -25,9 +27,15 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
 
+
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true', description='Use sim time'),
         DeclareLaunchArgument('cmd_vel_out',  default_value='/mecanum_drive_controller/reference', description='cmd vel output topic'),
+        DeclareLaunchArgument(
+            name='model',
+            default_value=xacro_file,
+            description='Path to robot urdf/xacro file'
+        ),
         
         # Set Gazebo resource path for meshes
         AppendEnvironmentVariable(
@@ -48,7 +56,14 @@ def generate_launch_description():
             package='robot_state_publisher',
             executable='robot_state_publisher',
             parameters=[{
-                'robot_description': Command(['xacro ', xacro_file, ' use_gazebo:=true']),
+                'robot_description': ParameterValue(
+                    Command([
+                        'xacro ',
+                        LaunchConfiguration('model'),
+                        ' use_gazebo:=true'
+                    ]),
+                    value_type=str
+                ),
                 'use_sim_time': use_sim_time
             }]
         ),
@@ -135,14 +150,14 @@ def generate_launch_description():
         ),
         
         # 9. RViz
-        # Node(
-        #     package='rviz2',
-        #     executable='rviz2',
-        #     name='rviz2',
-        #     output='screen',
-        #     arguments=['-d', rviz_config],
-        #     parameters=[{'use_sim_time': use_sim_time}]
-        # ),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', rviz_config],
+            parameters=[{'use_sim_time': use_sim_time}]
+        ),
 
         # 10. Twist Mux
         Node(

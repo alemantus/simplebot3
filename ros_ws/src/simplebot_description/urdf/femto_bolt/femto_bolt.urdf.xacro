@@ -34,7 +34,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="$(find simplebot_description)/meshes/femto_bolt/femto_bolt.stl" />
+          <mesh filename="package://simplebot_description/meshes/femto_bolt/femto_bolt.stl" />
         </geometry>
         <material name="">
           <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
@@ -42,9 +42,9 @@
       </visual>
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <mesh filename="$(find simplebot_description)/meshes/femto_bolt/femto_bolt.stl" />
-        </geometry>
+          <geometry>
+            <mesh filename="package://simplebot_description/meshes/femto_bolt/femto_bolt.stl" />
+          </geometry>
       </collision>
       <inertial>
       <mass value="0.2"/>

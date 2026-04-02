@@ -34,7 +34,7 @@ mecanum_drive_controller:
       wheel_separation: 0.206
       wheel_base: 0.13
       sum_of_robot_center_projection_on_X_Y_axis: 0.168 # (0.206 + 0.13) / 2 = 0.168
-     # sum_of_robot_center_projection_on_X_Y_axis: 0.336 # (0.206 + 0.13) = 0.336
+      # sum_of_robot_center_projection_on_X_Y_axis: 0.336 # (0.206 + 0.13) = 0.336
 
     # TF configuration
     base_frame_id: base_footprint
@@ -51,12 +51,24 @@ hand_controller:
       - roarm_base_link_to_link1
       - link1_to_link2
       - link2_to_link3
+      - link3_to_link4
+      - link4_to_link5
     command_interfaces:
       - position
     state_interfaces:
       - position
       - velocity
+    # Added interpolation and constraints for better arm movement
+    state_publish_rate: 50.0
+    action_monitor_rate: 20.0
+    allow_partial_joints_goal: false
 
 gripper_controller:
   ros__parameters:
-    joint: link3_to_gripper_link
+    # This must be the SINGLE actuated joint that drives the mimic joints
+    joint: straight_bracket_left_joint
+    # Optional: Define tolerances if using GripperCommand actions
+    action_monitor_rate: 20.0
+    goal_tolerance: 0.01
+    max_effort: 10.0
+    allow_stalling: true
