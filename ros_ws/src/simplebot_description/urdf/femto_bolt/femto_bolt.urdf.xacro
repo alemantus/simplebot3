@@ -161,7 +161,7 @@
           <always_on>1</always_on>
           <update_rate>30</update_rate>
           <visualize>true</visualize>
-          <topic>${prefix}/depth</topic>
+          <topic>${prefix}/depth/image_raw</topic>
           <gz_frame_id>${prefix}_depth_optical_frame</gz_frame_id>
         </sensor>
       </gazebo>

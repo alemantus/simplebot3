@@ -45,28 +45,40 @@
   gz_type_name: "gz.msgs.Model"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/camera/image_raw"
-  gz_topic_name: "/camera/image_raw"
+- ros_topic_name: "/femto_bolt/image_raw"
+  gz_topic_name: "/femto_bolt/image_raw"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/camera/depth"
-  gz_topic_name: "/camera/depth"
+- ros_topic_name: "/femto_bolt/depth/image_raw"
+  gz_topic_name: "/femto_bolt/depth/image_raw"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/camera/camera_info"
-  gz_topic_name: "/camera/camera_info"
+- ros_topic_name: "/femto_bolt/camera_info"
+  gz_topic_name: "/femto_bolt/camera_info"
   ros_type_name: "sensor_msgs/msg/CameraInfo"
   gz_type_name: "gz.msgs.CameraInfo"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/camera/depth/camera_info"
-  gz_topic_name: "/camera/depth/camera_info"
+- ros_topic_name: "/femto_bolt/depth/camera_info"
+  gz_topic_name: "/femto_bolt/depth/camera_info"
   ros_type_name: "sensor_msgs/msg/CameraInfo"
   gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "gripper/left_contact"
+  gz_topic_name: "gripper/left_contact"
+  ros_type_name: "ros_gz_interfaces/msg/Contacts"
+  gz_type_name: "gz.msgs.Contacts"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "gripper/right_contact"
+  gz_topic_name: "gripper/right_contact"
+  ros_type_name: "ros_gz_interfaces/msg/Contacts"
+  gz_type_name: "gz.msgs.Contacts"
   direction: GZ_TO_ROS
 # Velocity commands: handled directly by ros2_control (do NOT bridge)
 # - ros_topic_name: "/cmd_vel"

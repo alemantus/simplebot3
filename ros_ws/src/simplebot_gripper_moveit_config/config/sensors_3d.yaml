@@ -1,0 +1,23 @@
+sensors:
+  - orbbec_bolt_depth
+  - rplidar_c1_cloud
+orbbec_bolt_depth:
+  sensor_plugin: occupancy_map_monitor/DepthImageOctomapUpdater
+  image_topic: /camera/depth/image_raw
+  queue_size: 5
+  near_clipping_plane_distance: 0.2
+  far_clipping_plane_distance: 4.0
+  shadow_threshold: 0.1
+  padding_offset: 0.03
+  padding_scale: 1.0
+  filtered_cloud_topic: filtered_bolt_cloud
+  max_update_rate: 5.0
+rplidar_c1_cloud:
+  sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
+  point_cloud_topic: /scan
+  max_range: 12.0
+  point_subsample: 1
+  padding_offset: 0.02
+  padding_scale: 1.0
+  filtered_cloud_topic: filtered_lidar_cloud
+  max_update_rate: 10.0

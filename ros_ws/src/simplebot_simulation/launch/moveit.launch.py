@@ -18,12 +18,12 @@ def generate_launch_description():
             file_path="urdf/robots/simplebot_description.urdf.xacro",
             mappings={"use_gazebo": "true"},
         )
-        .robot_description_semantic(file_path="config/roarm_m2/roarm_m2.srdf")
-        .robot_description_kinematics(file_path="config/roarm_m2/kinematics.yaml")
-        .trajectory_execution(file_path="config/roarm_m2/moveit_controllers.yaml")
-        .joint_limits(file_path="config/roarm_m2/joint_limits.yaml")
-        .sensors_3d(file_path="config/roarm_m2/sensors_3d.yaml")
-        .pilz_cartesian_limits(file_path="config/roarm_m2/pilz_cartesian_limits.yaml")
+        .robot_description_semantic(file_path="config/simplebot2.srdf")
+        .robot_description_kinematics(file_path="config/kinematics.yaml")
+        .trajectory_execution(file_path="config/moveit_controllers.yaml")
+        .joint_limits(file_path="config/joint_limits.yaml")
+        .sensors_3d(file_path="config/sensors_3d.yaml")
+        .pilz_cartesian_limits(file_path="config/pilz_cartesian_limits.yaml")
         .to_moveit_configs()
     )
 

@@ -17,7 +17,23 @@ def generate_launch_description():
         arguments=["mecanum_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
+    # 3. Hand Controller: MoveIt manipulation arm
+    hand_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["hand_controller", "--controller-manager", "/controller_manager"],
+    )
+
+    # 4. Gripper Controller: MoveIt gripper action
+    gripper_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["gripper_controller", "--controller-manager", "/controller_manager"],
+    )
+
     return LaunchDescription([
         joint_state_broadcaster_spawner,
         mecanum_drive_controller_spawner,
+        hand_controller_spawner,
+        gripper_controller_spawner,
     ])

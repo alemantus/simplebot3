@@ -10,56 +10,56 @@ default_acceleration_scaling_factor: 0.1
 joint_limits:
   left_finger_joint:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   left_gear_arm_joint:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   link1_to_link2:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   link2_to_link3:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   link3_to_link4:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   link4_to_link5:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   right_finger_joint:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   right_gear_arm_joint:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   roarm_base_link_to_link1:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   straight_bracket_left_joint:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0
   straight_bracket_right_joint:
     has_velocity_limits: true
-    max_velocity: 1
-    has_acceleration_limits: false
-    max_acceleration: 0
+    max_velocity: 1.0
+    has_acceleration_limits: true
+    max_acceleration: 5.0

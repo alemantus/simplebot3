@@ -131,12 +131,21 @@
       </geometry>
       <material name="silver"/>
     </visual>
-    <collision>
+    <collision name="left_finger_collision">
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
         <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/left_finger.stl"  scale="1.0 1.0 1.0"/>
       </geometry>
     </collision>
+    <sensor name="left_finger_contact" type="contact">
+      <contact>
+        <collision>left_finger_collision</collision>
+      </contact>
+      <always_on>1</always_on>
+      <update_rate>50</update_rate>
+      <visualize>true</visualize>
+      <topic>/gripper/left_contact</topic>
+    </sensor>
   </link>
 
   <link name="right_finger">
@@ -152,12 +161,21 @@
       </geometry>
       <material name="silver"/>
     </visual>
-    <collision>
+    <collision name="right_finger_collision">
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="file://$(find simplebot_description)/meshes/roarm_m2/right_finger.stl"  scale="1.0 1.0 1.0"/>
+        <box size="0.01 0.01 0.05" />
       </geometry>
     </collision>
+    <sensor name="right_finger_contact" type="contact">
+      <contact>
+        <collision>right_finger_collision</collision>
+      </contact>
+      <always_on>1</always_on>
+      <update_rate>50</update_rate>
+      <visualize>true</visualize>
+      <topic>/gripper/right_contact</topic>
+    </sensor>
   </link>
 
   <!-- ===== GRIPPER JOINTS ===== -->
@@ -234,6 +252,15 @@
       <axis xyz="0 1 0"/>
       <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
       <mimic joint="straight_bracket_left_joint" multiplier="1.0" offset="0.0"/>
+      
+  </joint>
+
+  <link name="hand_tcp"/>
+
+  <joint name="gripper_base_to_hand_tcp" type="fixed">
+    <origin xyz="0 -0.005 0.12" rpy="1.5708 0 0"/>
+    <parent link="gripper_base"/>
+    <child link="hand_tcp"/>
   </joint>
 
 </xacro:macro>

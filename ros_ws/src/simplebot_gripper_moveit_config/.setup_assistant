@@ -6,8 +6,8 @@ moveit_setup_assistant_config:
     relative_path: config/simplebot2.srdf
   package_settings:
     author_name: alexander
-    author_email: ses@ses.ses
-    generated_timestamp: 1773676790
+    author_email: alexander@anak.dk
+    generated_timestamp: 1775206417
   control_xacro:
     command:
       - position
