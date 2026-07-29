@@ -10,6 +10,7 @@ class ArmTools:
             {
                 "ik_request": {
                     "group_name": "hand",
+                    "robot_state": {"is_diff": True},
                     "pose_stamped": {
                         "header": {"frame_id": "base_link"},
                         "pose": {

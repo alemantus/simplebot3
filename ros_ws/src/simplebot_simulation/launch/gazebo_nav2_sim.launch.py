@@ -3,10 +3,11 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, AppendEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-
+from launch.conditions import IfCondition
 
 def generate_launch_description():
     pkg_description = get_package_share_directory('simplebot_description')
@@ -15,6 +16,7 @@ def generate_launch_description():
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     pkg_nav2 = get_package_share_directory('nav2_bringup')
     pkg_slam_toolbox = get_package_share_directory('slam_toolbox')
+    pkg_rosbridge_server = get_package_share_directory('rosbridge_server')
     
     # Files
     xacro_file = os.path.join(pkg_description, 'urdf', 'robots', 'simplebot_description.urdf.xacro')
@@ -35,6 +37,12 @@ def generate_launch_description():
             name='model',
             default_value=xacro_file,
             description='Path to robot urdf/xacro file'
+        ),
+
+        DeclareLaunchArgument(
+            'use_rviz',
+            default_value='true',
+            description='Whether to start RViz'
         ),
         
         # Set Gazebo resource path for meshes
@@ -148,6 +156,24 @@ def generate_launch_description():
                 'enable_stamped_cmd_vel': 'true'
             }.items()
         ),
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_simulation, 'launch', 'moveit.launch.py')
+            ),
+            launch_arguments={
+                'use_sim_time': use_sim_time
+            }.items()
+        ),
+
+        IncludeLaunchDescription(
+            XMLLaunchDescriptionSource(
+                os.path.join(pkg_rosbridge_server, 'launch', 'rosbridge_websocket_launch.xml')
+            ),
+            launch_arguments={
+                'use_sim_time': use_sim_time
+            }.items()
+        ),
         
         # 9. RViz
         Node(
@@ -156,7 +182,8 @@ def generate_launch_description():
             name='rviz2',
             output='screen',
             arguments=['-d', rviz_config],
-            parameters=[{'use_sim_time': use_sim_time}]
+            parameters=[{'use_sim_time': use_sim_time}],
+            condition=IfCondition(LaunchConfiguration('use_rviz'))
         ),
 
         # 10. Twist Mux

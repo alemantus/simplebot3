@@ -28,9 +28,9 @@ class RosInterface:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def send_action(self, action_name, action_type, goal):
+    def send_action(self, action_name, action_type, goal, timeout=30.0):
         if self.connector:
-            return self.connector.send_action(action_name, action_type, goal)
+            return self.connector.send_action(action_name, action_type, goal, timeout=timeout)
             
         payload = {
             "action_name": action_name,
@@ -39,6 +39,22 @@ class RosInterface:
         }
         try:
             response = requests.post(f"{self.url}/send_action_goal", json=payload)
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def subscribe_once(self, topic, msg_type, timeout=5.0):
+        if self.connector:
+            return self.connector.subscribe_once(topic, msg_type, timeout=timeout)
+            
+        payload = {
+            "topic": topic,
+            "msg_type": msg_type,
+            "timeout": timeout
+        }
+        try:
+            response = requests.post(f"{self.url}/subscribe_once", json=payload)
             response.raise_for_status()
             return response.json()
         except Exception as e:

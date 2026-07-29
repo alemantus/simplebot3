@@ -4,7 +4,7 @@ ujson
 aiortc
 av
 opencv-python
-empy
+empy==3.3.4
 lark
 catkin_pkg
 pytest
@@ -31,3 +31,11 @@ colcon-common-extensions
 click
 setproctitle
 docstring-parser
+
+# MCP Server
+fastmcp>=2.11.3
+mcp[cli]>=1.13.0
+jsonschema>=4.25.1
+pillow>=11.3.0
+websocket-client>=1.8.0
+cbor2
