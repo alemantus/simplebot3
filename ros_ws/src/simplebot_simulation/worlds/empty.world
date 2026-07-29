@@ -121,5 +121,47 @@
       
     </model>
 
+    <model name="crate">
+      <static>false</static>
+
+      <pose>2 2 1 0 0 0</pose>
+
+      <link name="link">
+
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/alexander/simplebot3/ros_ws/src/simplebot_simulation/worlds/models/Green_brick.stl</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+          <material>
+          <ambient>0 1 0 1</ambient>
+          <diffuse>0 1 0 1</diffuse>
+        </material>
+        </visual>
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.1</ixx>
+            <iyy>0.1</iyy>
+            <izz>0.1</izz>
+          </inertia>
+        </inertial>
+
+        
+
+      </link>
+    </model>
+
   </world>
 </sdf>

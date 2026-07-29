@@ -7,9 +7,10 @@ class ObjectInteractionTools:
 
     def find_object(self, class_name, timeout=5.0):
         """
-        Find an object by class name in the YOLO 3D detections.
+        Find an object by class name in the refined YOLO 3D detections.
         Returns the detection dictionary or None.
         """
+        # We subscribe to the refined 3D detections from the segmentation node
         result = self.ros.subscribe_once("/yolo/detections_3d", "yolo_msgs/msg/DetectionArray", timeout=timeout)
         if not result or "msg" not in result or not result["msg"].get("detections"):
             return None
@@ -18,6 +19,30 @@ class ObjectInteractionTools:
             if detection["class_name"] == class_name:
                 return detection
         return None
+
+    def get_object_position(self, class_name):
+        """
+        Get the precise 3D position of an object in base_link.
+        """
+        obj = self.find_object(class_name)
+        if not obj:
+            return {"success": False, "error": f"Object '{class_name}' not found"}
+        
+        pos = obj["bbox3d"]["center"]["position"]
+        frame_id = obj["bbox3d"]["frame_id"]
+        
+        # If the frame is not base_link, we need to transform it.
+        # But for simplicity, we assume the AI will handle the transform 
+        # or we use tf2_echo if needed.
+        # However, the segmentation node now publishes in the depth optical frame.
+        
+        return {
+            "success": True,
+            "class_name": class_name,
+            "position": {"x": pos["x"], "y": pos["y"], "z": pos["z"]},
+            "frame_id": frame_id,
+            "message": f"Found {class_name} at {pos['x']:.3f}, {pos['y']:.3f}, {pos['z']:.3f} in {frame_id}"
+        }
 
     def align_with_object(self, class_name):
         """

@@ -31,8 +31,8 @@ This guide is written for an AI assistant connected to a ROS 2 Jazzy robot via t
 6. **NEVER hallucinate tool execution** — If you do not see a "Tool Output" block with a success message, the action did not happen.
 7. **NEVER "assume" success** — Always verify the return code of an action.
 8. **NEVER pass negative distances to Nav2 actions directly** — Use the high-level `drive_straight` tool which now handles both forward and backward motion.
-9. **NEVER ask "shall I proceed?" during a multi-step sequence** — If the user gave you a complete task (e.g., "drive forward, turn around, come back"), execute all steps sequentially without pausing to ask for confirmation between steps. Only stop if an error occurs.
-10. **NEVER narrate a tool call instead of making it** — Saying "I am now calling `send_action_goal`" or "I will use the `turn` tool" in plain text **does absolutely nothing**. If you write this and do not immediately follow it with an actual tool invocation block, the robot does not move. This is the most common failure mode. If you catch yourself writing "I will call...", stop and make the call instead.
+11. **NEVER use the terminal or shell commands (like `tf2_echo`) to find objects.** This is fragile and often fails due to environment pathing. ALWAYS use the high-level `get_object_position` tool.
+12. **NEVER narrate a tool call instead of making it** — Saying "I am now calling `send_action_goal`" or "I will use the `turn` tool" in plain text **does absolutely nothing**. If you write this and do not immediately follow it with an actual tool invocation block, the robot does not move. This is the most common failure mode. If you catch yourself writing "I will call...", stop and make the call instead.
 
 ### ✅ ALWAYS DO THESE
 
@@ -395,15 +395,19 @@ subscribe_for_duration(topic='/scan', msg_type='sensor_msgs/msg/LaserScan', dura
 3. If the data was for recording state (e.g., initial pose), note that you could not record it, but **continue with the rest of the task anyway**.
 4. **NEVER stop a multi-step sequence** just because one subscription returned empty.
 
-### 6.7 YOLO Object Detection
+### 6.7 YOLO Object Detection and 3D Localization
 
-```
-Topic: /yolo/detections_3d
-Type: yolo_msgs/msg/DetectionArray
-```
+The robot uses YOLO for object detection and segmentation. There are two primary topics for 3D data:
 
-To find the position of detected objects, subscribe to `/yolo/detections_3d`. The `bbox3d.center.position` gives the `x, y, z` coordinates of the object.
-**CRITICAL:** The coordinates are typically in the `base_link` frame. This means `x` is the distance *directly in front* of the robot.
+1.  **`/yolo/detections_3d`**: (Type: `yolo_msgs/msg/DetectionArray`)
+    This topic provides refined 3D centroids for each detected object. The coordinates are calculated by the **Segmentation PCL Node** using the object's segmentation mask and depth data. This is the most accurate source for object localization.
+    - `bbox3d.center.position`: The [x, y, z] centroid of the object.
+    - `bbox3d.frame_id`: Usually the camera's depth frame.
+
+2.  **`/yolo/segmented_pointcloud`**: (Type: `sensor_msgs/msg/PointCloud2`)
+    A point cloud containing only the points belonging to segmented objects. Useful for visualization and collision avoidance.
+
+**CRITICAL:** When asked where an object is, always prefer the `bbox3d.center.position` from `/yolo/detections_3d`.
 
 **Example Tool Input (`subscribe_once`):**
 ```json
@@ -414,44 +418,17 @@ To find the position of detected objects, subscribe to `/yolo/detections_3d`. Th
 }
 ```
 
-**Fallback Terminal Protocol (if subscribe fails due to custom messages):**
-If `subscribe_once` returns a message type error, use the `terminal` or `run_command` tool to echo the topic directly inside the container, ensuring you source the workspace first:
-```json
-{
-  "command": "source /opt/ros/jazzy/setup.bash && source /home/alexander/simplebot3/ros_ws/install/setup.bash && ros2 topic echo /yolo/detections_3d --once",
-  "cwd": "/home/alexander/simplebot3/ros_ws"
-}
-```
+### 6.8 Segmentation PCL Node
 
-When adjusting distance to an object, you can use `drive_straight` with either positive (forward) or negative (backward) values. To increase distance (back up), calculate the difference and pass it as a negative value.
+The **Segmentation PCL Node** is responsible for mapping 2D segmentation masks from the RGB camera to the 3D depth space. It performs a two-pass projection to ensure perfect alignment despite the baseline offset between sensors.
 
-### 6.8 Object-Relative Navigation (YOLO)
+- **Input Topics**: `/yolo/detections`, `/femto_bolt/depth/image_raw`, `/femto_bolt/camera_info`.
+- **Output Topics**: `/yolo/detections_3d`, `/yolo/segmented_pointcloud`.
+- **Parameters**:
+    - `outlier_z_threshold`: Filters background noise (default: 0.05m).
+    - `mask_offset_x/y`: Manual calibration offsets.
 
-To approach a detected object (like a "fire hydrant") to a specific standoff distance:
-
-1. **Read YOLO topic**: Use `subscribe_once` to get the object's 3D position.
-   ```json
-   {
-     "topic": "/yolo/detections_3d",
-     "msg_type": "yolo_msgs/msg/DetectionArray",
-     "timeout": 5.0
-   }
-   ```
-2. **Identify Target X**: Look for the `bbox3d.center.position.x` value in the `base_link` frame. This is the distance from the robot's center to the object's center (in meters).
-3. **Calculate Move Distance**: `move_distance = current_x - standoff_target`.
-   - Example: If `current_x = 0.5m` and target is `0.25m`, `move_distance = 0.25m` (forward).
-   - Example: If `current_x = 0.12m` and target is `0.25m`, `move_distance = -0.13m` (backward).
-4. **Execute Move**: Use the `drive_straight` high-level tool.
-   ```json
-   {
-     "tool": "drive_straight",
-     "arguments": { "distance": 0.25 }
-   }
-   ```
-5. **Verify**: Check the distance again to confirm the standoff.
-
-**⚠️ Warning:** At very close distances (< 0.3m), an object may fall out of the camera's Field of View or below its minimum sensing range. If detections disappear as you get close, use LiDAR (`/scan`) to verify the final standoff distance.
-
+---
 
 ## 7. Checking Robot State
 
@@ -595,19 +572,17 @@ When asked to "drive forward, turn around, and come back to the same position an
 
 ## 12. High-Level Tools Reference (Recommended)
 
-| MCP Tool Name       | Arguments                          | Returns                          | Notes                                     |
-| ------------------- | ---------------------------------- | -------------------------------- | ----------------------------------------- |
-| `get_robot_pose`    | (none)                             | `x, y, yaw_degrees, orientation` | **Use this for all pose reading**         |
-| `navigate_to`       | `x, y, yaw_degrees`                | success/error                    | **Absolute map navigation**               |
-| `move_arm_xyz`      | `x, y, z`                          | success/error                    | `/compute_ik` + `/hand_controller/...`    |
-| `drive_straight`    | `distance`, `speed`                | success/error                    | Supports both forward and backward motion   |
-| `turn`              | `angle_degrees`                    | success/error                    | `/spin`                                   |
-| `approach_object`   | `class_name`, `standoff`           | success/error                    | **New: Align and drive to YOLO object**   |
-| `align_with_object` | `class_name`                       | success/error                    | **New: Rotate to face YOLO object**       |
-| `reach_object`      | `class_name`, `offset_z`           | target_coords                    | **New: Calculate arm coords for object**  |
-| `stop_robot`        | (none)                             | success/error                    | Goal Cancellation                         |
-| `open_gripper`      | (none)                             | success/error                    | `/gripper_controller/...` (pos: 0.0)      |
-| `close_gripper`     | (none)                             | success/error                    | `/gripper_controller/...` (pos: -1.545)   |
+| MCP Tool Name         | Arguments                          | Returns                          | Notes                                     |
+| --------------------- | ---------------------------------- | -------------------------------- | ----------------------------------------- |
+| `get_robot_pose`      | (none)                             | `x, y, yaw_degrees, orientation` | **Use this for all pose reading**         |
+| `get_object_position` | `class_name`                       | `position, frame_id, score`      | **Primary tool for object localization**  |
+| `navigate_to`         | `x, y, yaw_degrees`                | success/error                    | **Absolute map navigation**               |
+| `move_arm_xyz`        | `x, y, z`                          | success/error                    | `/compute_ik` + `/hand_controller/...`    |
+| `drive_straight`      | `distance`, `speed`                | success/error                    | Supports both forward and backward motion   |
+| `turn`                | `angle_degrees`                    | success/error                    | `/spin`                                   |
+| `open_gripper`        | (none)                             | success/error                    | `/gripper_controller/...` (pos: 0.0)      |
+| `close_gripper`       | (none)                             | success/error                    | `/gripper_controller/...` (pos: -1.545)   |
+| `stop_robot`          | (none)                             | success/error                    | Goal Cancellation                         |
 
 ---
 
@@ -621,13 +596,17 @@ When asked to "drive forward, turn around, and come back to the same position an
 - Always verify action completion by checking the result, do not assume success
 - Be absolutely sure that the command you promise to send is actually sent!
 
-### 14. Retrieving Poses and Transforms
+---
+
+## 14. Retrieving Poses and Transforms
 
 Calculating the position of a link (like `link5`) relative to another (like `base_link`) **MUST** be done by resolving the kinematic chain. Because the `/tf` topic is fragmented and the `/rosapi/get_transform` service may be unavailable, follow these protocols in order of priority.
 
-#### 13.1 The "Terminal Echo" Protocol (High Reliability)
+#### 14.1 The "Terminal Echo" Protocol (Kinematic Links ONLY)
 
-If a direct service call fails or is missing, use the **`terminal`** tool. This is the most effective way to resolve a transform because it handles the TF buffer internally.
+If you need to find the position of a **robot link** (like `link5`) relative to another (like `base_link`), use the **`terminal`** tool. 
+
+**🚨 WARNING:** DO NOT use this protocol to find objects (cubes, hydrants, etc.). For objects, use `get_object_position`.
 
 **Crucial Path Instruction**: When using the `terminal` tool, you **must** specify the working directory, otherwise it will fail with a `cd` error.
 
@@ -640,15 +619,11 @@ If a direct service call fails or is missing, use the **`terminal`** tool. This 
 ```json
 {
   "command": "timeout 5s ros2 run tf2_ros tf2_echo base_link link5",
-  "cwd": "/home/alexander/simplebot3/ros_ws",
-  "cd": "/home/alexander/simplebot3/ros_ws"
+  "cwd": "/home/alexander/simplebot3/ros_ws"
 }
 ```
 
-_(Include both `cwd` and `cd` just in case your specific terminal tool variant uses the other name)._
-_Wait for the terminal output, which will provide `At time... Translation: [x, y, z]`._
-
-#### 13.2 The Service Call Protocol (Preferred if Active)
+#### 14.2 The Service Call Protocol (Preferred if Active)
 
 Use the `call_service` tool only if the `/rosapi/get_transform` service is active in the environment.
 
@@ -669,68 +644,39 @@ Use the `call_service` tool only if the `/rosapi/get_transform` service is activ
 }
 ```
 
-#### 13.3 SLAM Pose vs. Kinematic Pose
+#### 14.3 SLAM Pose vs. Kinematic Pose
 
 1.  **Robot in the Room:** Subscribe to `/pose` (Type: `geometry_msgs/msg/PoseWithCovarianceStamped`) to find the robot on the **map**.
-2.  **Arm relative to Robot:** Use the **Terminal Echo** protocol (Section 13.1) to find a specific link relative to **base_link**.
-
-#### 13.4 Why to AVOID Raw /tf Subscriptions
-
-The `/tf` topic publishes individual links (e.g., `link4` to `link5`) in separate packets. Subscribing to `/tf` via `subscribe_once` or `subscribe_for_duration` will usually only return the mobile base transform (`odom` to `base_footprint`) and will **fail** to provide the full chain from `base_link` to `link5`. Always prefer tools that use a TF Buffer like `tf2_echo`.
+2.  **Arm relative to Robot:** Use the **Terminal Echo** protocol (Section 14.1) to find a specific link relative to **base_link**.
 
 ---
 
-**Example Tool Input:**
-service_name: "/rosapi/get_transform"
-service_type: "rosapi_msgs/srv/GetTransform"
-request: {
-"frame_id": "base_link",
-"child_frame_id": "link5"
-}
-
-### 15. Execution Integrity & Tool Usage
+## 15. Execution Integrity & Tool Usage
 
 ### 15.1 Actual vs. Described Action (ANTI-HALLUCINATION PROTOCOL)
 
 You must maintain a strict 1:1 relationship between your words and your tool calls.
 
 **🚨 CRITICAL: NARRATION IS NOT EXECUTION!**
-Saying "I will now call the tool" or "I am calling `send_action_goal`" in plain text **DOES NOTHING**. The robot will just sit there. If the user has to say "you did not call it!", you have failed this rule.
-
-**The test:** Before you send any message, ask yourself: _Did I actually emit a tool invocation block, or did I only write text about it?_ If the answer is "only text", you have not called the tool.
+Saying "I will now call the tool" in plain text **DOES NOTHING**. The robot will just sit there.
 
 1. **Do not write** "I am moving the arm..." unless your _very next output_ is the formal tool invocation.
 2. **Never claim** an action was successful until you receive the actual JSON response from the tool execution.
-3. If the tool call fails or parses incorrectly (e.g., getting string/JSON errors), do not pretend it worked. Fix your JSON syntax and use the tool again formally.
-4. **If you find yourself writing "I will now call..." — STOP. Make the call instead. Do not announce it, just do it.**
+3. **If you find yourself writing "I will now call..." — STOP. Make the call instead.**
 
-### 15.2 Multi-Step Verification
+### 15.2 Multi-Step Planning (BE DECISIVE)
 
-When performing a task (e.g., "Pick up the block"):
+1.  **Plan ALL steps** up front before executing any.
+2.  **Execute each step sequentially** — call the tool, wait for the result, then immediately call the next tool.
+3.  **Do NOT pause between steps to ask for permission.**
 
-1. Call tool to move arm.
-2. Wait for tool output.
-3. Call tool to close gripper.
-4. Wait for tool output.
-5. Report final status.
+---
 
-### 15.3 Multi-Step Planning (BE DECISIVE)
-
-When the user gives a multi-step task (e.g., "move forward 0.5m, turn around, come back, face the original direction"):
-
-1. **Plan ALL steps** up front before executing any.
-2. **Record the initial pose** by subscribing to `/pose` before the first movement.
-3. **Execute each step sequentially** — call the tool, wait for the result, then immediately call the next tool.
-4. **Do NOT pause between steps to ask the user** "shall I proceed?" or "do you want me to continue?" — just execute the plan.
-5. **If a step fails**, report the error and suggest an alternative. Do not continue with the remaining steps unless you can recover.
-6. **After all steps**, verify the final state matches the expected outcome.
-
-### 16. Speed and Safety Guidelines
+## 16. Speed and Safety Guidelines
 
 | Motion Type                         | Recommended Speed    | Max Speed        |
 | ----------------------------------- | -------------------- | ---------------- |
 | Forward driving                     | 0.2 m/s              | 0.3 m/s          |
-| Backward driving                    | 0.15 m/s             | 0.2 m/s          |
 | Arm movement                        | 3 seconds per motion | 1 second minimum |
 | Time allowance (all Nav2 behaviors) | 30 seconds           | 60 seconds       |
 
@@ -738,72 +684,42 @@ When the user gives a multi-step task (e.g., "move forward 0.5m, turn around, co
 
 ## 17. Known Issues and Workarounds
 
-### 17.1 `navigate_to` Timeouts and "Failed to make progress" Errors
+### 17.1 `navigate_to` Timeouts
 
-**Symptom 1:** `navigate_to` returns "Action timed out".
-**Cause:** The tool has a 60-second timeout, but navigation to a distant pose may take longer.
+**Symptom:** `navigate_to` returns "Action timed out".
 **Workaround:** Send the exact same `navigate_to` goal again to resume waiting.
-
-**Symptom 2:** The terminal shows `[controller_server]: Failed to make progress` and the robot twitches or doesn't move.
-**Cause:** Nav2's local planner cannot find a valid trajectory. This almost ALWAYS happens when you ask Nav2 to navigate to a target that is too close to the robot (less than 0.5 meters away), or if the target is inside an obstacle on the costmap.
-**Workaround:**
-
-1. **For short distances (< 0.5m): NEVER use `navigate_to`.** Calculate the required rotation and distance yourself, then use the `turn` and `drive_straight` tools instead.
-2. **For blocked targets:** Choose a target further away from walls/obstacles.
-
-## 18. Operational Directive (AI Execution Protocol)
-
-**Role:** You are the **SimpleBot3 Controller**. Your goal is **Zero-Delay Execution**.
-
-### 🛠 Execution Logic (The "1-2-3" Rule)
-
-1.  **Acknowledge:** State the plan in one sentence (e.g., "I will drive 0.5m, turn 180°, and return.")
-2.  **Act:** Immediately invoke all necessary tools in sequence. **Do not stop to ask for permission between steps.**
-3.  **Report:** Once all tool calls return, provide a 1-sentence summary of the final state or any errors.
-
-### ⚠️ Hard Constraints for Model Logic
-
-- **Decisiveness:** Execute the _entire_ task chain provided by the user without pausing for intermediate confirmation.
-- **Anti-Hallucination:** Never claim success until a tool response is received.
-- **No "Fluff":** Omit conversational fillers. Be as specific and brief as possible.
-
-### 📝 Example Ideal Response
-
-**User:** "Drive forward 0.5m and open the gripper."
-
-**Assistant:**
-"I will drive 0.5m forward and then open the gripper."
-`{ "tool": "drive_straight", "arguments": { "distance": 0.5 } }`
-_(Wait for output...)_
-`{ "tool": "open_gripper", "arguments": {} }`
-_(Wait for output...)_
-"Task complete: Robot moved 0.5m and gripper is now open."
 
 ---
 
-## 19. Object Interaction Tools
+## 18. Operational Directive (AI Execution Protocol)
 
-These tools automate the workflow of using YOLO 3D detections for navigation and manipulation.
+1.  **Acknowledge:** One sentence plan.
+2.  **Act:** Invoke tools.
+3.  **Report:** One sentence summary.
 
-### 19.1 `approach_object`
+---
 
-Use this to drive to a specific standoff distance from a detected object (e.g., a "fire hydrant"). It automatically handles the rotation and distance calculation.
+## 19. Object Interaction & Localization Tools
 
-- **MCP Tool Name:** `approach_object`
-- **Arguments:** `class_name` (string), `standoff_distance` (float, default 0.3)
+The following tools automate the workflow of using YOLO 3D detections for navigation and manipulation.
 
-### 19.2 `align_with_object`
+### 19.1 High-Level Localization Tool: `get_object_position`
 
-Rotates the robot to face the center of the specified YOLO object. Use this before starting complex arm tasks to ensure the object is centered in the workspace.
+Use the **`get_object_position`** tool to get the precise 3D centroid of any detected object. This is the **only** recommended way to retrieve object coordinates.
 
-- **MCP Tool Name:** `align_with_object`
-- **Arguments:** `class_name` (string)
+- **MCP Tool Name:** `get_object_position`
+- **Arguments:** `class_name` (string, e.g., "green cube")
+- **Returns:** JSON object with `position` (x, y, z), `frame_id`, and `score`.
 
-### 19.3 `reach_object`
+**Example:**
+- `get_object_position(class_name="green cube")`
 
-Calculates the 3D coordinates for the arm to reach a detected object.
+### 19.2 Handling Localization Results
 
-- **MCP Tool Name:** `reach_object`
-- **Arguments:** `class_name` (string), `offset_z` (float, default 0.05), `offset_x` (float, default 0.0)
-- **Returns:** `{ "x": float, "y": float, "z": float }`
-- **Usage:** Call this tool first to get the coordinates, then pass the resulting `x, y, z` to the `move_arm_xyz` tool.
+1.  **Check Success**: Always verify `success: True`. If the object is not in view, the tool will return an error.
+2.  **Frame Context**: The `position` is typically in the camera's `femto_bolt_depth_optical_frame`.
+3.  **Action Chain**:
+    *   Find object: `get_object_position("green cube")`
+    *   Align: `turn(...)` to face the object
+    *   Approach: `drive_straight(...)`
+    *   Reach: `move_arm_xyz(...)`
