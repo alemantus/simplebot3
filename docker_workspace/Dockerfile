@@ -8,6 +8,7 @@ ARG GID=1000
 ENV VIRTUAL_ENV=/home/$USERNAME/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+ENV VIRTUAL_ENV_YOLO=/home/$USERNAME/venv_yolo
 
 
 # Update packages and install basic tools
@@ -99,6 +100,13 @@ RUN python3 -m venv $VIRTUAL_ENV
 COPY ./requirements.txt /home/$USERNAME/requirements.txt
 RUN $VIRTUAL_ENV/bin/pip install --no-cache-dir -r /home/$USERNAME/requirements.txt
 RUN $VIRTUAL_ENV/bin/pip install --break-system-packages pillow
+
+# Use --system-site-packages so venv_yolo can see ROS packages (cv_bridge, rclpy, etc.)
+# Packages installed into venv_yolo (e.g. numpy 2.x) take priority over system versions
+RUN python3 -m venv --system-site-packages $VIRTUAL_ENV_YOLO
+COPY ./requirements_yolo.txt /home/$USERNAME/requirements_yolo.txt
+RUN $VIRTUAL_ENV_YOLO/bin/pip install --no-cache-dir -r /home/$USERNAME/requirements_yolo.txt
+
 
 # Set up ROS 2 workspace
 WORKDIR /home/$USERNAME/simplebot3/ros_ws
