@@ -38,3 +38,6 @@ A image of the robot with an articulated arm. The arm in question is the wavesha
 A demonstration video showcasing the autonomous driving functionality in action.
 
 [![Autonomous Driving Video](show_case/autonomous_driving.gif)](show_case/autonomous_driving.gif)
+
+### 4. Roarm m2 controlled using moveit2
+<video src="show_case/roarm_moveit.mp4" width="320" height="240" controls></video>
