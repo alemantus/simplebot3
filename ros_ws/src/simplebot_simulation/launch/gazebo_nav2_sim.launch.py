@@ -12,6 +12,7 @@ from launch.conditions import IfCondition
 def generate_launch_description():
     pkg_description = get_package_share_directory('simplebot_description')
     pkg_simulation = get_package_share_directory('simplebot_simulation')
+    pkg_roarm = get_package_share_directory('roarm_package')
     pkg_simplebot2 = get_package_share_directory('simplebot2')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     pkg_nav2 = get_package_share_directory('nav2_bringup')
@@ -159,7 +160,7 @@ def generate_launch_description():
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                os.path.join(pkg_simulation, 'launch', 'moveit.launch.py')
+                os.path.join(pkg_roarm, 'launch', 'moveit.launch.py')
             ),
             launch_arguments={
                 'use_sim_time': use_sim_time
