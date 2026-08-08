@@ -1,144 +1,256 @@
-#!/home/alexander/venv/bin/python
-
-from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, LogInfo
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import LaunchConfiguration
-from launch.conditions import IfCondition
-from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 import os
-
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, AppendEnvironmentVariable
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression
+from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
+from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
-    # Declare arguments for conditional configurations
-    use_slam = DeclareLaunchArgument('use_slam', default_value='false', description='Launch SLAM nodes')
-    use_nav = DeclareLaunchArgument('use_nav', default_value='false', description='Launch Navigation2 stack')
-    use_nav2_wo_amcl = DeclareLaunchArgument('use_nav2_wo_amcl', default_value='true', description='Launch Navigation2 stack without amcl')
-    use_camera = DeclareLaunchArgument('use_camera', default_value='false', description='Launch camera node')
-    map_file = DeclareLaunchArgument(
-        'map',
-        default_value=os.path.join(
-            get_package_share_directory('nav2_bringup'),
-            'maps',
-            'apartment_map/apartment.yaml'  # Replace with your map file name
-        ),
-        description='Full path to the map file to load'
-    )
-    log_level = DeclareLaunchArgument(
-        'log_level',
-        default_value='info',
-        description='Logging level (debug, info, warn, error, fatal)'
-    )
+    pkg_description = get_package_share_directory('simplebot_description')
+    pkg_simulation = get_package_share_directory('simplebot_simulation')
+    pkg_simplebot2 = get_package_share_directory('simplebot2')
+    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+    pkg_nav2 = get_package_share_directory('nav2_bringup')
+    pkg_slam_toolbox = get_package_share_directory('slam_toolbox')
+    pkg_rosbridge_server = get_package_share_directory('rosbridge_server')
+    pkg_sllidar = get_package_share_directory('sllidar_ros2')
+    
+    # Files
+    xacro_file = os.path.join(pkg_description, 'urdf', 'robots', 'simplebot_description.urdf.xacro')
+    controllers_yaml = os.path.join(pkg_description, 'config', 'ros2_controllers.yaml')
+    gz_bridge_config = os.path.join(pkg_simulation, 'config', 'ros_gz_bridge.yaml')
+    nav2_params = os.path.join(pkg_simplebot2, 'config', 'nav2_params.yaml')
+    world_file = os.path.join(pkg_simulation, 'worlds', 'empty.world')
+    rviz_config = os.path.join(pkg_simulation, 'rviz', 'yahboom_rosmaster_gazebo_sim.rviz')
+    slam_params = os.path.join(pkg_simplebot2, 'config', 'mapper_params_online_async.yaml')
+    twist_mux_config = os.path.join(pkg_simplebot2, 'config', 'twist_mux.yaml')
+    lidar_launch_path = os.path.join(pkg_sllidar, 'launch', 'lidar_launch.py')
 
-    # Paths to launch files
-    cmd_vel_mux_path = os.path.join(get_package_share_directory('cmd_vel_mux'), 'launch', 'cmd_vel_mux-launch.py')
-    foxglove_bridge_launch_path = os.path.join(get_package_share_directory('rosbridge_server'), 'launch', 'rosbridge_websocket_launch.xml')
-    lidar_launch_path = os.path.join(get_package_share_directory('sllidar_ros2'), 'launch', 'lidar_launch.py')
-    robot_control_launch_path = os.path.join(get_package_share_directory('motor_controller2'), 'launch', 'robot_control_launch.py')
-    localization_launch_path = os.path.join(get_package_share_directory('simplebot2'), 'launch', 'localization_launch.py')
-    joy_launch_path = os.path.join(get_package_share_directory('simplebot2'), 'launch', 'joy_launch.py')
-    static_tf_path = os.path.join(get_package_share_directory('simplebot2'), 'launch', 'static_tf_launch.py')
-    camera_launch_path = os.path.join(get_package_share_directory('camera_package'), 'launch', 'camera_launch.py')
-    slam_launch_path = os.path.join(get_package_share_directory('simplebot2'), 'launch', 'online_async_launch.py')
-    nav2_bringup_launch_path = os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'bringup_launch.py')
-    nav2_bringup_wo_amcl_launch_path = os.path.join(get_package_share_directory('nav2_bringup'), 'launch', 'bringup_wo_amcl_launch.py')
-    i2c_launch_path = os.path.join(get_package_share_directory('sensor_package'), 'launch', 'i2c_launch.py')
-    joy2pose_launch_path = os.path.join(get_package_share_directory('misc'), 'launch', 'joy2pose_launch.py')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_sim_gazebo = LaunchConfiguration('use_sim_gazebo', default='false')
+    use_chassis = LaunchConfiguration('use_chassis', default='true')
+    use_arm = LaunchConfiguration('use_arm', default='true')
+
+    robot_description_content = ParameterValue(
+        Command([
+            'xacro ',
+            LaunchConfiguration('model'),
+            ' use_gazebo:=',
+            use_sim_gazebo
+        ]),
+        value_type=str
+    )
 
     return LaunchDescription([
-        # Declare arguments
-        use_slam,
-        use_nav,
-        use_camera,
-        map_file,
-        use_nav2_wo_amcl,
-        log_level,
+        DeclareLaunchArgument('use_sim_time', default_value='false', description='Use sim time'),
+        DeclareLaunchArgument('use_sim_gazebo', default_value='false', description='Use sim gazebo'),
+        DeclareLaunchArgument('use_chassis', default_value='true', description='Launch mecanum chassis controller'),
+        DeclareLaunchArgument('use_arm', default_value='true', description='Launch RoArm hand & gripper controllers'),
+        DeclareLaunchArgument('cmd_vel_out', default_value='/mecanum_drive_controller/reference', description='cmd vel output topic'),
+        DeclareLaunchArgument(
+            name='model',
+            default_value=xacro_file,
+            description='Path to robot urdf/xacro file'
+        ),
+        DeclareLaunchArgument(
+            'use_rviz',
+            default_value='true',
+            description='Whether to start RViz'
+        ),
+        DeclareLaunchArgument(
+            'use_slam',
+            default_value='true',
+            description='Whether to start SLAM toolbox'
+        ),
+        DeclareLaunchArgument(
+            'use_nav',
+            default_value='true',
+            description='Whether to start Navigation2'
+        ),
+        
+        # Set Gazebo resource path for meshes
+        AppendEnvironmentVariable(
+            'GZ_SIM_RESOURCE_PATH',
+            os.path.join(pkg_description, '..')
+        ),
 
-        # Always included components
+        # 1. Gazebo Sim (Only when running in simulation)
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(robot_control_launch_path),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')
+            ),
+            launch_arguments={
+                'gz_args': f'-r {world_file}'
+            }.items(),
+            condition=IfCondition(use_sim_gazebo)
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(localization_launch_path),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+
+        # 2. Robot State Publisher
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            parameters=[{
+                'robot_description': robot_description_content,
+                'use_sim_time': use_sim_time
+            }]
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(static_tf_path),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+
+        # 3. ros2_control_node (Real Hardware ONLY: runs controller_manager & loads C++ plugins)
+        Node(
+            package="controller_manager",
+            executable="ros2_control_node",
+            parameters=[
+                controllers_yaml,
+                {'robot_description': robot_description_content, 'use_sim_time': use_sim_time}
+            ],
+            output="screen",
+            condition=UnlessCondition(use_sim_gazebo)
         ),
+
+        # 4. Real Lidar Node (Real Hardware ONLY when chassis is enabled)
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(lidar_launch_path),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+            condition=IfCondition(
+                PythonExpression(["'", use_sim_gazebo, "' == 'false' and '", use_chassis, "' == 'true'"])
+            )
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(joy_launch_path),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+
+        # 5. Spawn Robot & Bridges in Gazebo (Simulation ONLY)
+        Node(
+            package='ros_gz_sim',
+            executable='create',
+            arguments=[
+                '-topic', 'robot_description',
+                '-name', 'simplebot2',
+                '-z', '1.0'
+            ],
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+            condition=IfCondition(use_sim_gazebo)
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(cmd_vel_mux_path),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+        Node(
+            package='ros_gz_bridge',
+            executable='parameter_bridge',
+            parameters=[{'config_file': gz_bridge_config, 'use_sim_time': use_sim_time}],
+            output='screen',
+            condition=IfCondition(use_sim_gazebo)
         ),
-        # IncludeLaunchDescription(
-        #     XMLLaunchDescriptionSource(foxglove_bridge_launch_path),
-        #     launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
-        # ),
-        #IncludeLaunchDescription(PythonLaunchDescriptionSource(i2c_launch_path)),
-        # three launch mode
-        # 1) nav2 with map
-        #   - launch with use_nav:=true use_nav2_wo_amcl:= false use_slam:=false
-        #   - TODO: add map as argument
+        Node(
+            package='ros_gz_image',
+            executable='image_bridge',
+            name='gz_image_bridge',
+            parameters=[{'use_sim_time': use_sim_time}],
+            output='screen',
+            condition=IfCondition(use_sim_gazebo)
+        ),
 
-        # 2) nav2 without amcl (slam provide map)
-        #   - launch with use_nav:=false use_nav2_wo_amcl:=true use_slam:=true
+        # 6. ROS2 Controllers Spawners
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+            parameters=[{'use_sim_time': use_sim_time}],
+        ),
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            arguments=["mecanum_drive_controller", "--controller-manager", "/controller_manager"],
+            parameters=[{'use_sim_time': use_sim_time}],
+            condition=IfCondition(use_chassis)
+        ),
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            arguments=["hand_controller", "--controller-manager", "/controller_manager"],
+            parameters=[{'use_sim_time': use_sim_time}],
+            condition=IfCondition(use_arm)
+        ),
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            arguments=["gripper_controller", "--controller-manager", "/controller_manager"],
+            parameters=[{'use_sim_time': use_sim_time}],
+            condition=IfCondition(use_arm)
+        ),
 
-        # 3) mapping mode with just slam
-        #   - launch with use_nav:=false use_nav2_wo_amcl:=false use_slam:=true
-
-        # mode 1) nav2 with map
+        # 7. Nav2 Online Async SLAM
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(nav2_bringup_launch_path),
-            condition=IfCondition(LaunchConfiguration('use_nav')),
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_slam_toolbox, 'launch', 'online_async_launch.py')
+            ),
             launch_arguments={
-                'map': LaunchConfiguration('map'),
-                'log_level': LaunchConfiguration('log_level')
+                'use_sim_time': use_sim_time, 
+                'slam_params_file': slam_params,
+                'log_level': 'error',
+                'enable_stamped_cmd_vel': 'true'
+            }.items(),
+            condition=IfCondition(
+                PythonExpression(["'", LaunchConfiguration('use_slam'), "' == 'true' and '", use_chassis, "' == 'true'"])
+            )
+        ),
+
+        # 8. Nav2 Bringup Navigation
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_nav2, 'launch', 'navigation_launch.py')
+            ),
+            launch_arguments={
+                'use_sim_time': use_sim_time,
+                'params_file': nav2_params,
+                'run_amcl': 'false',
+                'use_lifecycle_manager': 'true',
+                'log_level': 'error',
+                'enable_stamped_cmd_vel': 'true'
+            }.items(),
+            condition=IfCondition(
+                PythonExpression(["'", LaunchConfiguration('use_nav'), "' == 'true' and '", use_chassis, "' == 'true'"])
+            )
+        ),
+
+        # MoveIt (Arm ONLY) — suppress its built-in RViz; main_launch controls the single RViz
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_simulation, 'launch', 'moveit.launch.py')
+            ),
+            launch_arguments={
+                'use_sim_time': use_sim_time,
+                'use_rviz': 'false',
+            }.items(),
+            condition=IfCondition(use_arm)
+        ),
+
+        IncludeLaunchDescription(
+            XMLLaunchDescriptionSource(
+                os.path.join(pkg_rosbridge_server, 'launch', 'rosbridge_websocket_launch.xml')
+            ),
+            launch_arguments={
+                'use_sim_time': use_sim_time
             }.items()
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(joy2pose_launch_path),
-            condition=IfCondition(LaunchConfiguration('use_nav')),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+        
+        # 9. RViz
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', rviz_config],
+            parameters=[{'use_sim_time': use_sim_time}],
+            condition=IfCondition(LaunchConfiguration('use_rviz'))
         ),
 
-        # mode 2) nav2 without amcl
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(nav2_bringup_wo_amcl_launch_path),
-            condition=IfCondition(LaunchConfiguration('use_nav2_wo_amcl')),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
+        # 10. Twist Mux (Chassis ONLY)
+        Node(
+            package='twist_mux',
+            executable='twist_mux',
+            name='twist_mux',
+            output='screen',
+            remappings={('/cmd_vel_out', LaunchConfiguration('cmd_vel_out'))},
+            parameters=[twist_mux_config, {'use_sim_time': use_sim_time}],
+            condition=IfCondition(use_chassis)
         ),
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(joy2pose_launch_path),
-            condition=IfCondition(LaunchConfiguration('use_nav2_wo_amcl')),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
-        ),
-
-        # mode 3) conditionally include SLAM
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(slam_launch_path),
-            condition=IfCondition(LaunchConfiguration('use_slam')),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
-        ),
-
-        # Conditionally include Camera
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(camera_launch_path),
-            condition=IfCondition(LaunchConfiguration('use_camera')),
-            launch_arguments={'log_level': LaunchConfiguration('log_level')}.items()
-        ),
-
-        # Log info
-        LogInfo(condition=IfCondition(LaunchConfiguration('use_slam')), msg="SLAM is enabled"),
-        LogInfo(condition=IfCondition(LaunchConfiguration('use_nav')), msg="Navigation is enabled"),
-        LogInfo(condition=IfCondition(LaunchConfiguration('use_camera')), msg="Camera is enabled"),
     ])
