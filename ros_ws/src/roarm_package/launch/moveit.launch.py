@@ -2,12 +2,15 @@ import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration("use_sim_time", default="true")
+    use_sim_time = LaunchConfiguration("use_sim_time", default="false")
+    use_rviz = LaunchConfiguration("use_rviz", default="true")
+    use_gazebo = LaunchConfiguration("use_gazebo", default="false")
 
     # Build MoveIt config from simplebot_description package.
     # The URDF is the full robot (arm + base) with use_gazebo:=true so ros2_control
@@ -16,7 +19,7 @@ def generate_launch_description():
         MoveItConfigsBuilder("simplebot2", package_name="simplebot_description")
         .robot_description(
             file_path="urdf/robots/simplebot_description.urdf.xacro",
-            mappings={"use_gazebo": "true"},
+            mappings={"use_gazebo": use_gazebo},
         )
         .robot_description_semantic(file_path="config/simplebot2.srdf")
         .robot_description_kinematics(file_path="config/kinematics.yaml")
@@ -59,13 +62,19 @@ def generate_launch_description():
             moveit_config.joint_limits,
             {"use_sim_time": use_sim_time},
         ],
+        condition=IfCondition(use_rviz),
     )
 
     return LaunchDescription([
         DeclareLaunchArgument(
             "use_sim_time",
-            default_value="true",
+            default_value="false",
             description="Use Gazebo simulation clock",
+        ),
+        DeclareLaunchArgument(
+            "use_rviz",
+            default_value="true",
+            description="Launch RViz with MoveIt plugin",
         ),
         move_group_node,
         rviz_node,

@@ -38,18 +38,18 @@ def generate_launch_description():
             output='screen'
         ),
         
-        # Add laser filter node
-        Node(
-            package='laser_filters',
-            executable='scan_to_scan_filter_chain',
-            name='lidar_filter',
-            parameters=[{
-                'filter_chain': '/path/to/lidar_filter.yaml'
-            }],
-            remappings=[
-                ('scan', '/scan'),                # input from lidar
-                ('scan_filtered', '/scan_filtered') # output topic
-            ],
-            output='screen'
-        ),
+        # Add laser filter node (disabled if laser_filters is not installed)
+        # Node(
+        #     package='laser_filters',
+        #     executable='scan_to_scan_filter_chain',
+        #     name='lidar_filter',
+        #     parameters=[{
+        #         'filter_chain': '/path/to/lidar_filter.yaml'
+        #     }],
+        #     remappings=[
+        #         ('scan', '/scan'),                # input from lidar
+        #         ('scan_filtered', '/scan_filtered') # output topic
+        #     ],
+        #     output='screen'
+        # ),
     ])

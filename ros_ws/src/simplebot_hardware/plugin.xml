@@ -1,0 +1,16 @@
+<library path="simplebot_hardware">
+  <class name="simplebot_hardware/SimplebotChassisHardware"
+         type="simplebot_hardware::SimplebotChassisHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ros2_control hardware interface for the mecanum mobile base.
+    </description>
+  </class>
+  <class name="simplebot_hardware/RoArmHardware"
+         type="simplebot_hardware::RoArmHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ros2_control hardware interface for the RoArm robotic arm and gripper.
+    </description>
+  </class>
+</library>

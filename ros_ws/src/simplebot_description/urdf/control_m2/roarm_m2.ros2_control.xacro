@@ -9,9 +9,11 @@
                 <xacro:if value="${use_gazebo}">
                     <plugin>gz_ros2_control/GazeboSimSystem</plugin>
                 </xacro:if>
-                <!-- Use mock hardware when not running in Gazebo (e.g. RViz only) -->
+                <!-- Use RoArm C++ hardware plugin when not running in Gazebo -->
                 <xacro:unless value="${use_gazebo}">
-                    <plugin>mock_components/GenericSystem</plugin>
+                    <plugin>simplebot_hardware/RoArmHardware</plugin>
+                    <param name="serial_port">/dev/ttyUSB0</param>
+                    <param name="baud_rate">115200</param>
                 </xacro:unless>
             </hardware>
             <joint name="roarm_base_link_to_link1">
