@@ -5,6 +5,16 @@
 ## So what works?
 
 Currently I have the following up and running
+- Sensors
+  - Orbbecc femto bolt tof camera with integrated IMU
+  - 4x motorencoders
+  - Slamtech c1 LiDAR
+  - External IMU (LSM6DS)
+ 
+- Nav2
+  - SLAM
+  - Sensor fusion and pose estimation
+  - Mapping and localization
 
 - Gazebo environment
   - Mecanum drive plug-in
@@ -16,8 +26,9 @@ Currently I have the following up and running
   - Orbbec femto bolt camera
   - Of the roarm2
   - The robot arm extended with gripper
-- MoveIt2 for the roarm
-- Nav2
+    
+- MoveIt2 for arm with 5 DoF and gripper
+
 
 
 ## Showcase Files
