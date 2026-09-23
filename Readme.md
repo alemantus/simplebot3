@@ -42,3 +42,6 @@ A demonstration video showcasing the autonomous driving functionality in action.
 ### 4. Roarm m2 controlled using moveit2
 
 [![Roarm m2 Video](show_case/roarm_moveit.gif)](show_case/roarm_moveit.gif)
+
+New roarm fitted with gripper and two extra DoF
+![Robot with Gripper](show_case/roamr_w_gripper.jpg)
