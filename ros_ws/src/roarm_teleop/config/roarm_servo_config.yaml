@@ -1,0 +1,52 @@
+moveit_servo:
+  use_gazebo: false
+
+  ## Properties of incoming commands
+  command_in_type: "unitless"      # "unitless" or "speed_units"
+  scale:
+    linear: 0.4                     # max effective m/s when using unitless
+    rotational: 0.8                 # max effective rad/s when using unitless
+    joint: 0.5
+
+  ## Outgoing command loop
+  publish_period: 0.01              # 100 Hz
+  # NOTE: newer moveit_servo releases replaced "low_pass_filter_coeff" with
+  # a smoothing plugin. Check your installed default config:
+  #   ros2 pkg prefix moveit_servo
+  #   find <that path>/share/moveit_servo -name "*.yaml"
+  # and copy whichever of these two your version actually declares:
+  low_pass_filter_coeff: 2.0
+  # smoothing_filter_plugin_name: "online_signal_smoothing::ButterworthFilterPlugin"
+
+  ## Frames
+  robot_link_command_frame: "base_link"   # confirm against the SRDF virtual_joint parent
+  planning_frame: "base_link"
+  ee_frame_name: "hand_tcp"
+
+  ## MoveIt group
+  move_group_name: "hand"
+
+  ## Command output -> your arm's controller
+  command_out_type: "trajectory_msgs/JointTrajectory"
+  command_out_topic: "/hand_controller/joint_trajectory"
+  publish_joint_positions: true
+  publish_joint_velocities: false
+  publish_joint_accelerations: false
+
+  ## Incoming command topics (relative to node name -> /servo_node/...)
+  cartesian_command_in_topic: "~/delta_twist_cmds"
+  joint_command_in_topic: "~/delta_joint_cmds"
+
+  joint_topic: "/joint_states"
+
+  ## Collision checking
+  check_collisions: true
+  collision_check_rate: 10.0
+  self_collision_proximity_threshold: 0.01
+  scene_collision_proximity_threshold: 0.02
+
+  ## Singularity handling
+  lower_singularity_threshold: 17.0
+  hard_stop_singularity_threshold: 30.0
+
+  override_velocity_scaling_factor: 0.0   # 0 = don't override

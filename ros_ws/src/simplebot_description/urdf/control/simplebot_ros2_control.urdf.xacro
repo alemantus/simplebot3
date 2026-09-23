@@ -4,14 +4,15 @@
     <xacro:macro name="yahboom_rosmaster_ros2_control" params="prefix use_gazebo">
         <ros2_control name="RobotSystem" type="system">
             <hardware>
-                <xacro:if value="${use_gazebo}">
+                <!-- <xacro:if value="${use_gazebo}"> -->
+                <xacro:if value="1">
                     <plugin>gz_ros2_control/GazeboSimSystem</plugin>
                 </xacro:if>
-                <xacro:unless value="${use_gazebo}">
+                <!-- <xacro:unless value="${use_gazebo}">
                     <plugin>simplebot_hardware/SimplebotChassisHardware</plugin>
                     <param name="serial_port">/dev/motor_controller</param>
-                    <param name="baud_rate">115200</param>
-                </xacro:unless>
+                    <param name="baud_rate">115200</param> 
+                </xacro:unless>-->
             </hardware>
 
             <joint name="${prefix}front_left_wheel_joint">

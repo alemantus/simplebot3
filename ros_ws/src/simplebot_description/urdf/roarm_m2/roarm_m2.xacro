@@ -6,6 +6,8 @@
 <xacro:include filename="$(find simplebot_description)/urdf/roarm_m2/roarm_m2.gazebo" />
 <xacro:include filename="$(find simplebot_description)/urdf/roarm_m2/gripper.xacro" />
 
+
+
 <!-- ===== ARM LINKS ===== -->
 
 <link name="roarm_base_link">
@@ -96,6 +98,8 @@
      This is where the gripper attaches. -->
 <link name="tool0" />
 <link name="link5" />
+<link name="base_link" />
+
 
 <link name="link4">
   <inertial>
@@ -119,6 +123,13 @@
 </link>
 
 <!-- ===== ARM JOINTS ===== -->
+
+<joint name="base_link_to_roarm_base_link" type="fixed">
+  <origin xyz="0.0 0 0.0" rpy="0 0 0" />
+  <parent link="base_link" />
+  <child link="roarm_base_link" />
+</joint>
+
 
 <joint name="roarm_base_link_to_link1" type="revolute">
   <origin xyz="0.0100000008759151 0 0.123059270461044" rpy="0 0 0" />

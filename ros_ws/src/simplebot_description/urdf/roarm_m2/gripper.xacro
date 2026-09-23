@@ -198,7 +198,7 @@
       <child link="straight_bracket_left"/>
       <origin xyz="0.0315 -0.00496 0.0215" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <limit lower="-1.6" upper="0" effort="10" velocity="1.0"/>
   </joint>
 
   <!-- Right bracket: mirrors left bracket via meshing gears -->
@@ -207,7 +207,7 @@
       <child link="straight_bracket_right"/>
       <origin xyz="-0.0315 -0.00496 0.0215" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit lower="0" upper="1.545" effort="10" velocity="1.0"/>
+      <limit lower="0" upper="1.6" effort="10" velocity="1.0"/>
       <mimic joint="straight_bracket_left_joint" multiplier="-1.0" offset="0.0"/>
   </joint>
 
@@ -217,7 +217,7 @@
       <child link="left_gear_arm"/>
       <origin xyz="0.0105 -0.00496 0.0425" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <limit lower="-1.6" upper="0" effort="10" velocity="1.0"/>
       <mimic joint="straight_bracket_left_joint" multiplier="1.0" offset="0.0"/>
   </joint>
 
@@ -227,7 +227,7 @@
       <child link="right_gear_arm"/>
       <origin xyz="-0.0105 -0.00496 0.0425" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit lower="0" upper="1.545" effort="10" velocity="1.0"/>
+      <limit lower="0" upper="1.6" effort="10" velocity="1.0"/>
       <mimic joint="straight_bracket_left_joint" multiplier="-1.0" offset="0.0"/>
   </joint>
 
@@ -238,7 +238,7 @@
       <child link="left_finger"/>
       <origin xyz="0.0432 0.0045 0.0" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit lower="0" upper="1.545" effort="10" velocity="1.0"/>
+      <limit lower="0" upper="1.6" effort="10" velocity="1.0"/>
       <mimic joint="straight_bracket_left_joint" multiplier="-1.0" offset="0.0"/>
   </joint>
 
@@ -250,7 +250,7 @@
       <child link="right_finger"/>
       <origin xyz="-0.0432 0.0045 0.0" rpy="0 0 0"/>
       <axis xyz="0 1 0"/>
-      <limit lower="-1.545" upper="0" effort="10" velocity="1.0"/>
+      <limit lower="-1.6" upper="0" effort="10" velocity="1.0"/>
       <mimic joint="straight_bracket_left_joint" multiplier="1.0" offset="0.0"/>
       
   </joint>

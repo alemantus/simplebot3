@@ -2,7 +2,7 @@
 # efficiently and robustly using ROS 2 Control.
 controller_manager:
   ros__parameters:
-    update_rate: 500 # Hz
+    update_rate: 10 # Hz
 
     # Declare the controllers
     joint_state_broadcaster:
