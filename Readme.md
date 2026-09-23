@@ -44,4 +44,4 @@ A demonstration video showcasing the autonomous driving functionality in action.
 [![Roarm m2 Video](show_case/roarm_moveit.gif)](show_case/roarm_moveit.gif)
 
 New roarm fitted with gripper and two extra DoF
-![Robot with Gripper](show_case/roarm_w_gripper.jpg)
+![Robot with Gripper](show_case/Roarm_w_gripper.jpg)
